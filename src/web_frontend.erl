@@ -1,5 +1,4 @@
 -module(web_frontend).
--include("data.hrl").
 -export([init/2]).
 
 -spec bin_to_int(binary()) -> integer().

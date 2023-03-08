@@ -9,7 +9,6 @@
          atomically/1]).
 
 close_tables() ->
-   % dets:close(person),
     dets:close(transfer),
     dets:close(account),
     dets:close(table_id).
