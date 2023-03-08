@@ -35,8 +35,11 @@ xirbank/*/*.dets
 # Mac #
 .DS_Store
 .env
-yarn-error.log
 
 # VSCode
 bin
 .vscode
+/account.dets
+/person.dets
+/table_id.dets
+/transfer.dets

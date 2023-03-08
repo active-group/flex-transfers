@@ -20,7 +20,7 @@ start_cowboy() ->
                                              {"/bank-statements/request", web_frontend, request_bank_statement}]}]),
 
     {ok, _} = cowboy:start_clear(my_http_listener,
-                                 [{port, 8000}],
+                                 [{port, 8001}],
                                  #{env => #{dispatch => Dispatch}}).
 
 
