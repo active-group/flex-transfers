@@ -6,7 +6,6 @@ _*
 Mnesia.*
 .eunit
 *.o
-*.beam
 *.plt
 *.swp
 *.swo
@@ -18,9 +17,7 @@ erl_crash.dump
 logs
 _build
 .idea
-*.iml
 rebar3.crashdump
-*~
 [0-9][0-9]-*.pdf
 flex-ag.zip
 erlbank/nginx/sites-enabled/default.conf
