@@ -4,7 +4,7 @@
 -include("data.hrl").
 -export([init_database/0, write/2, read_all/2,
   put_account/0, put_account/1, get_account/1, get_all_accounts/0,
-  put_transfer/1, get_transfer/1, get_all_transfers/0, get_all_transfers/1,
+  put_transfer/1, get_transfer/1, get_all_transfers/0, get_all_transfers/1, get_all_transfers_from/1,
   unique_account_number/0, unique_transfer_id/0,
   atomically/1, put_accounts/1, put_event_id/1, last_event_id/0]).
 
@@ -113,6 +113,14 @@ get_all_transfers(AccountNumber) ->
       [{'orelse',
         {'==', {element, 3, '$1'}, AccountNumber},
         {'==', {element, 4, '$1'}, AccountNumber}}],
+      ['$_']}]),
+  lists:map(fun deserialize_transfer/1, Res).
+
+-spec get_all_transfers_from(unique_id()) -> list(#transfer{}).
+get_all_transfers_from(Number) ->
+  Res = dets:select(transfer,
+    [{'$1',
+      [{'>=', {element, 1, '$1'}, Number}],
       ['$_']}]),
   lists:map(fun deserialize_transfer/1, Res).
 
