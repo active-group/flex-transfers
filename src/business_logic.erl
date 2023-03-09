@@ -2,7 +2,7 @@
 
 -module(business_logic).
 -include("data.hrl").
--export([transfer/3, get_transfers/1]).
+-export([transfer/3, get_transfers/1, get_account/1]).
 
 -spec get_transfers(unique_id()) -> list(#transfer{}).
 get_transfers(Id) ->
@@ -55,10 +55,10 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
 get_account(AccountNumber) ->
-  Account = database:get_account(AccountNumber),
-  case {Account} of
+  Result = database:get_account(AccountNumber),
+  case Result of
     {error, not_found} ->
       account_event_receiver:receive_accounts(),
       database:get_account(AccountNumber);
-    _ -> Account
+    _ -> Result
   end.
