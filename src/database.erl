@@ -50,7 +50,7 @@ read_one(Table, Id, Deserialize) ->
 
 -spec read_all(dets:tab_name(), fun((tuple()) -> Obj)) -> list(Obj).
 read_all(Table, Deserialize) ->
-    Res = dets:select(Table,[{'_',[],['$_']}]),    
+    Res = dets:select(Table,[{'_',[],['$_']}]),
     lists:map(Deserialize, Res).
 
 -spec put_account() -> ok.
@@ -79,7 +79,7 @@ put_transfer(#transfer{id = Id, timestamp = Timestamp, from_account_number = Fro
 deserialize_transfer({Id, Timestamp, FromAccountNumber, ToAccountNumber, Amount}) ->
     #transfer{id = Id, timestamp = Timestamp, from_account_number = FromAccountNumber, to_account_number = ToAccountNumber, amount = Amount}.
 
--spec get_transfer(unique_id()) -> {ok, #transfer{}} | {error, any()}.
+-spec get_transfer(unique_id()) -> {ok, #transfer{}} | {error, any()}.
 get_transfer(Id) ->
     read_one(transfer, Id, fun deserialize_transfer/1).
 

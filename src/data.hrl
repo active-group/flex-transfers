@@ -5,6 +5,7 @@
 -record(account,
     {account_number :: account_number(),
      amount :: money()}).
+
 -record(transfer,
     {id :: unique_id(),
      timestamp :: erlang:timestamp(),
