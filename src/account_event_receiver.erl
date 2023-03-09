@@ -6,7 +6,7 @@
 
 receive_accounts() ->
   From = database:last_event_id(),
-  Events = gen_server:call(account_feed, {events, From}),
+  Events = gen_server:call({account_feed, accounts@accounts}, {events, From}),
   case Events of
     [{_, Index, _, _} | _Rest] ->
       Filtered = filter_for_new_account_events(Events),
