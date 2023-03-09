@@ -67,7 +67,7 @@ put_account(#account{account_number = AccountNumber, amount = Amount}) ->
 
 -spec put_accounts([#account{}]) -> [ok].
 put_accounts(Accounts) ->
-  lists:map(put_account, Accounts).
+  lists:map(fun put_account/1, Accounts).
 
 -spec last_event_id() -> number().
 last_event_id() ->
