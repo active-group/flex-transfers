@@ -38,7 +38,7 @@ start(_StartType, _StartArgs) ->
 
     database:init_database(),
 
-    accounts_mock:start_demo_link(),
+    % accounts_mock:start_demo_link(),
     AccountNode = getenv("ACCOUNTS_HOST",
                          fun (AccountsHost) -> list_to_atom("accounts@" ++ AccountsHost) end,
                          node()),
