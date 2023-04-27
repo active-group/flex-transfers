@@ -10,18 +10,6 @@
 
 -export([start/2, stop/1]).
 
-
-
-check_is_set(Var) ->
-    case os:getenv(Var) of
-        false ->
-            % FIXME: log it with logger?
-            io:format("Missing var ~s~n", [Var]),
-            halt(1);
-        _ -> ok
-    end.
-
-
 start_cowboy() ->
 
     %% Cowboy test code
@@ -36,6 +24,12 @@ start_cowboy() ->
                                  [{port, 8001}],
                                  #{env => #{dispatch => Dispatch}}).
 
+getenv(Var, Cont, Default) ->
+    case os:getenv(Var) of
+        false -> Default;
+        Value -> Cont(Value)
+    end.
+
 start(_StartType, _StartArgs) ->
 
     logger:info("Starting transfers-service: ~p~n", [node()]),
@@ -44,10 +38,10 @@ start(_StartType, _StartArgs) ->
 
     database:init_database(),
 
-    % check_is_set("ACCOUNTS_HOST"),
-    % AccountNode = list_to_atom("accounts@" ++ os:getenv("ACCOUNTS_HOST")),
     accounts_mock:start_demo_link(),
-    AccountNode = node(),
+    AccountNode = getenv("ACCOUNTS_HOST",
+                         fun (AccountsHost) -> list_to_atom("accounts@" ++ AccountsHost) end,
+                         node()),
     Res = erlbank_flex_transfers_sup:start_link(AccountNode),
 
     logger:info("Consuming accounts on: ~p~n", [AccountNode]),
