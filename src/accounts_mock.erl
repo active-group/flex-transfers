@@ -24,6 +24,8 @@ handle_call({Pid, no_events}, _From, {InitialEvents, LaterEvents}) ->
     lists:foreach(fun (Event) -> gen_server:cast(Pid, Event) end, LaterEvents),
     {reply, {ok, InitialEvents}, {[], LaterEvents}};
 
-handle_call({Pid, {event, LastEventNumber, _}}, _From, {_InitialEvents, LaterEvents}) ->
+handle_call({Pid, {event, LastEventNumber, _}}, _From, {InitialEvents, LaterEvents}) ->
+    Events = lists:filter(fun ({event, EventNumber, _}) -> EventNumber > LastEventNumber end, 
+                                  InitialEvents),
     lists:foreach(fun (Event) -> gen_server:cast(Pid, Event) end, LaterEvents),
-    {reply, {ok, []}, {[], []}}.
+    {reply, {ok, Events}, {[], []}}.
