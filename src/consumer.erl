@@ -4,6 +4,8 @@
 -export([init/1, handle_call/3, start_link/1, handle_cast/2, handle_info/2, process_events/2, terminate/2, code_change/3,
          make_state/2, update_pointer/2]).
 
+-type account_event() :: {event, non_neg_integer(), term()}.
+
 % FIXME: move to data.hrl?
 -record(state, {accounts_node :: node(), pointer :: non_neg_integer()}).
 
@@ -17,55 +19,48 @@ make_state(AccountsNode, Pointer) ->
 update_pointer(State, Pointer) ->
     State#state{ pointer = Pointer}.
 
--spec persist_event(#event{}) -> ok | nothing.
-persist_event(#event{type = new_account_event, content = {AccountNumber, _, Amount}}) ->
+-spec persist_event(account_event()) -> ok | nothing.
+persist_event({event, _Number, {account, AccountNumber, _PersonId, Amount}}) ->
     logger:info("Persisting account with number: ~p~n", [AccountNumber]),
     database:put_event(
       #event{index = database:next_event_index(),
              type = new_account_event,
              content = {AccountNumber, Amount}});
 
-persist_event(#event{type = new_person_event}) -> nothing.
+persist_event(_Event) -> nothing.
 
--spec next_index(list(#event{}), non_neg_integer()) -> non_neg_integer().
+-spec next_index(list(account_event()), non_neg_integer()) -> non_neg_integer().
 next_index([], Pointer) -> Pointer;
-next_index(Events, _) -> lists:max(lists:map(fun(Event) -> Event#event.index end, Events)) + 1.
+next_index(Events, _) -> lists:max(lists:map(fun({event, Number, _Payload}) -> Number end, Events)).
 
--spec update_data(list(#event{})) -> ok.
+-spec update_data(list(account_event())) -> ok.
 update_data(Events) ->
     lists:foreach(fun persist_event/1, Events).
 
+-spec process_events(list(account_event()), #state{}) -> #state{}.
 process_events([], State) -> State;
 process_events(Events, State) ->
     Pointer = State#state.pointer,
     %% A former (seemingly timed out) msg can come back. We dont want to
     %% double store events.
-    E = lists:filter(fun(Ev) -> Ev#event.index >= Pointer end, Events),
+    E = case Pointer of 
+            no_events -> Events;
+            _ -> lists:filter(fun({event, Number, _Payload}) -> Number > Pointer end, Events)
+        end,
     update_data(E),
     State#state{pointer = next_index(E, Pointer)}.
 
 start_link(AccountsNode) ->
-    gen_server:start_link({local, accounts_consumer}, ?MODULE, [AccountsNode], [{debug, [trace]}]).
+    gen_server:start_link({local, accounts_consumer}, ?MODULE, AccountsNode, [{debug, [trace]}]).
 
-init([AccountsNode]) ->
-    % timer:send_interval(10000, fetch),
+init(AccountsNode) ->
+    timer:send_interval(10000, fetch),
     self() ! fetch,
     {ok, #state{accounts_node = AccountsNode,
-                pointer = 0}}.
-
-handle_cast({person, _Id, _GivenName, _Surname}, State) ->
-    {noreply, State};
-
-handle_cast({account, AccountNumber, _PersonId, Amount}, State) ->
-    logger:info("Persisting account with number: ~p~n", [AccountNumber]),
-    database:put_event(
-      #event{index = database:next_event_index(),
-             type = new_account_event,
-             content = {AccountNumber, Amount}}),
-    {noreply, State};
+                pointer = no_events}}.
 
 handle_cast(Msg, State) ->
-    logger:error("Received illegal cast: ~p~n", [Msg]),
+    logger:error("Ignoring cast message: ~p~n", [Msg]),
     {noreply, State}.
 
 handle_call(Msg, _, State) ->
@@ -75,9 +70,10 @@ handle_call(Msg, _, State) ->
 handle_info(fetch, State) ->
     try
         AccountsNode = State#state.accounts_node,
-        % Pointer = State#state.pointer,
-        ok = gen_server:call({account_service, AccountsNode}, self()),
-        {noreply, State}
+        Pointer = State#state.pointer,
+        {ok, Events} = gen_server:call({account_service, AccountsNode}, {self(), {event, Pointer, dummy_payload}}),
+        NewState = process_events(Events, State),
+        {noreply, NewState}
     catch
         Error:Reason ->
             logger:error("Error consuming account events: ~p: ~p", [Error, Reason]),
