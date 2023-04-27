@@ -71,7 +71,11 @@ handle_info(fetch, State) ->
     try
         AccountsNode = State#state.accounts_node,
         Pointer = State#state.pointer,
-        {ok, Events} = gen_server:call({account_service, AccountsNode}, {self(), {event, Pointer, dummy_payload}}),
+        Msg = case Pointer of
+                  no_events -> no_events;
+                  Number -> {event, Number, dummy_payload}
+              end,
+        {ok, Events} = gen_server:call({account_service, AccountsNode}, {self(), Msg}),
         NewState = process_events(Events, State),
         {noreply, NewState}
     catch

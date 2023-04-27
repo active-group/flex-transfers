@@ -20,12 +20,10 @@ init(State) -> {ok, State}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
 
-handle_call({Pid, {event, LastEventNumber, _}}, _From, {InitialEvents, LaterEvents}) ->
-    Events = case LastEventNumber of
-                 no_events -> InitialEvents;
-                 _ ->
-                     lists:filter(fun ({event, EventNumber, _}) -> EventNumber > LastEventNumber end, 
-                                  InitialEvents)
-             end,
+handle_call({Pid, no_events}, _From, {InitialEvents, LaterEvents}) ->
     lists:foreach(fun (Event) -> gen_server:cast(Pid, Event) end, LaterEvents),
-    {reply, {ok, Events}, {[], []}}.
+    {reply, {ok, InitialEvents}, {[], LaterEvents}};
+
+handle_call({Pid, {event, LastEventNumber, _}}, _From, {_InitialEvents, LaterEvents}) ->
+    lists:foreach(fun (Event) -> gen_server:cast(Pid, Event) end, LaterEvents),
+    {reply, {ok, []}, {[], []}}.
