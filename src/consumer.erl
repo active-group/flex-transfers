@@ -76,7 +76,7 @@ handle_info(fetch, State) ->
     try
         AccountsNode = State#state.accounts_node,
         % Pointer = State#state.pointer,
-        ok = gen_server:call({account_node, AccountsNode}, self()),
+        ok = gen_server:call({account_service, AccountsNode}, self()),
         {noreply, State}
     catch
         Error:Reason ->

@@ -10,7 +10,7 @@ start_demo_link() ->
                 {account, 16, 2, 1600}]).
 
 start_link(Msgs) ->
-    gen_server:start_link({local, account_node}, ?MODULE, Msgs, []).
+    gen_server:start_link({local, account_service}, ?MODULE, Msgs, []).
 
 init(Msgs) -> {ok, Msgs}.
 
