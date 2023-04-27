@@ -62,6 +62,10 @@ handle_cast({account, AccountNumber, _PersonId, Amount}, State) ->
       #event{index = database:next_event_index(),
              type = new_account_event,
              content = {AccountNumber, Amount}}),
+    {noreply, State};
+
+handle_cast(Msg, State) ->
+    logger:error("Received illegal cast: ~p~n", [Msg]),
     {noreply, State}.
 
 handle_call(Msg, _, State) ->
