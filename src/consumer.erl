@@ -45,29 +45,35 @@ process_events(Events, State) ->
     State#state{pointer = next_index(E, Pointer)}.
 
 start_link(AccountsNode) ->
-    gen_server:start_link({local, accounts_consumer}, ?MODULE, [AccountsNode], []).
+    gen_server:start_link({local, accounts_consumer}, ?MODULE, [AccountsNode], [{debug, [trace]}]).
 
 init([AccountsNode]) ->
-    timer:send_interval(10000, fetch),
+    % timer:send_interval(10000, fetch),
+    self() ! fetch,
     {ok, #state{accounts_node = AccountsNode,
                 pointer = 0}}.
 
-handle_cast(Msg, State) ->
-    logger:error("Received illegal cast: ~p~n", [Msg]),
+handle_cast({person, _Id, _GivenName, _Surname}, State) ->
+    {noreply, State};
+
+handle_cast({account, AccountNumber, _PersonId, Amount}, State) ->
+    logger:info("Persisting account with number: ~p~n", [AccountNumber]),
+    database:put_event(
+      #event{index = database:next_event_index(),
+             type = new_account_event,
+             content = {AccountNumber, Amount}}),
     {noreply, State}.
 
 handle_call(Msg, _, State) ->
     logger:error("Received illegal call: ~p~n", [Msg]),
     {reply, undefined, State}.
 
-
 handle_info(fetch, State) ->
     try
         AccountsNode = State#state.accounts_node,
-        Pointer = State#state.pointer,
-        Events = gen_server:call({account_feed, AccountsNode}, {events, Pointer}),
-        NextState = process_events(Events, State),
-        {noreply, NextState}
+        % Pointer = State#state.pointer,
+        ok = gen_server:call({account_node, AccountsNode}, self()),
+        {noreply, State}
     catch
         Error:Reason ->
             logger:error("Error consuming account events: ~p: ~p", [Error, Reason]),

@@ -44,8 +44,10 @@ start(_StartType, _StartArgs) ->
 
     database:init_database(),
 
-    check_is_set("ACCOUNTS_HOST"),
-    AccountNode = list_to_atom("accounts@" ++ os:getenv("ACCOUNTS_HOST")),
+    % check_is_set("ACCOUNTS_HOST"),
+    % AccountNode = list_to_atom("accounts@" ++ os:getenv("ACCOUNTS_HOST")),
+    accounts_mock:start_demo_link(),
+    AccountNode = node(),
     Res = erlbank_flex_transfers_sup:start_link(AccountNode),
 
     logger:info("Consuming accounts on: ~p~n", [AccountNode]),
