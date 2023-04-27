@@ -1,29 +1,31 @@
 -module(accounts_mock).
 -behaviour(gen_server).
 
--export([init/1, handle_call/3, handle_cast/2, start_link/1, start_demo_link/0]).
+-export([init/1, handle_call/3, handle_cast/2, start_link/2, start_demo_link/0]).
 
 start_demo_link() ->
     start_link([{event, 0, {person, 1, <<"Mike">>, <<"Sperber">>}},
-                {event, 1, {account, 15, 1, 1500}},
-                {event, 2, {person, 2, <<"Simon">>, <<"Härer>">>}},
-                {event, 3, {account, 16, 2, 1600}}]).
+                 {event, 1, {account, 15, 1, 1500}},
+                 {event, 2, {person, 2, <<"Simon">>, <<"Härer>">>}},
+                 {event, 3, {account, 16, 2, 1600}}],
+                [{event, 4, {person, 3, <<"Mike">>, <<"Sperber">>}},
+                 {event, 5, {account, 17, 3, 1700}},
+                 {event, 6, {person, 4, <<"Simon">>, <<"Härer>">>}},
+                 {event, 7, {account, 18, 4, 1800}}]).
 
-start_link(Events) ->
-    gen_server:start_link({local, account_service}, ?MODULE, Events, []).
+start_link(InitialEvents, LaterEvents) ->
+    gen_server:start_link({local, account_service}, ?MODULE, {InitialEvents, LaterEvents}, []).
 
-init(Events) -> {ok, Events}.
+init(State) -> {ok, State}.
 
-handle_cast(_Msg, Events) -> {noreply, Events}.
+handle_cast(_Msg, State) -> {noreply, State}.
 
-handle_call({_Pid, {event, LastEventNumber, _Payload}}, _From, Events) ->
+handle_call({Pid, {event, LastEventNumber, _}}, _From, {InitialEvents, LaterEvents}) ->
     Events = case LastEventNumber of
-                 no_events -> Events;
+                 no_events -> InitialEvents;
                  _ ->
-                     lists:filter(fun ({event, EventNumber, _Payload}) -> EventNumber > LastEventNumber end, 
-                                  Events)
+                     lists:filter(fun ({event, EventNumber, _}) -> EventNumber > LastEventNumber end, 
+                                  InitialEvents)
              end,
-    {reply, {ok, Events}, Events}.
-                          
-                          
-
+    lists:foreach(fun (Event) -> gen_server:cast(Pid, Event) end, LaterEvents),
+    {reply, {ok, Events}, {[], []}}.

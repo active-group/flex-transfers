@@ -60,7 +60,7 @@ init(AccountsNode) ->
                 pointer = no_events}}.
 
 handle_cast(Msg, State) ->
-    logger:error("Ignoring cast message: ~p~n", [Msg]),
+    logger:info("Ignoring cast message: ~p~n", [Msg]),
     {noreply, State}.
 
 handle_call(Msg, _, State) ->
