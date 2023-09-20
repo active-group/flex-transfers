@@ -3,21 +3,26 @@
 -module(database).
 -include("data.hrl").
 -export([init_database/0, write/2, read_all/2,
+         get_account/1,
          put_transfer/1, get_transfer/1, get_all_transfers/0, get_all_transfers/1, unique_transfer_id/0,
          atomically/1]).
 
 close_tables() ->
     dets:close(transfer),
+    dets:close(account),
     dets:close(table_id).
 
 %% destroy tables in case they already existed
 destroy_tables() ->
+    file:delete("account.dets"),
     file:delete("transfer.dets").
 
 % unfortunately, delete_table doesn't always work such that create_table doesn't fail, so don't check return value
 create_tables() ->
     {ok, transfer} = dets:open_file(transfer, [{type, set}, {file, "transfer.dets"}]),
+    {ok, account} = dets:open_file(account, [{type, set}, {file, "account.dets"}]),
     {ok, table_id} = dets:open_file(table_id, [{type, set}, {file, "table_id.dets"}]),
+    dets:insert(table_id, {account, 0}),
     dets:insert(table_id, {transfer, 0}).
 
 init_database() ->
@@ -45,6 +50,13 @@ read_one(Table, Id, Deserialize) ->
         Error -> Error
     end.
 
+deserialize_account({AccountNumber, Amount}) ->
+    #account{account_number = AccountNumber, amount = Amount}.
+
+-spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
+get_account(AccountNumber) ->
+    read_one(account, AccountNumber, fun deserialize_account/1).
+
 -spec put_transfer(#transfer{}) -> ok.
 put_transfer(#transfer{id = Id, timestamp = Timestamp, from_account_number = FromAccountNumber, to_account_number = ToAccountNumber, amount = Amount}) ->
     write(transfer, {Id, Timestamp, FromAccountNumber, ToAccountNumber, Amount}).
@@ -68,7 +80,6 @@ get_all_transfers(AccountNumber) ->
                                 {'==', {element, 4, '$1'}, AccountNumber}}],
                             ['$_']}]),
     lists:map(fun deserialize_transfer/1, Res).
-    
 
 -spec unique_transfer_id() -> unique_id().
 unique_transfer_id() -> dets:update_counter(table_id, transfer, 1).
