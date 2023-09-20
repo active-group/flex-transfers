@@ -6,6 +6,8 @@
          get_account/1,
          put_transfer/1, get_transfer/1, get_all_transfers/0, get_all_transfers/1, unique_transfer_id/0,
          atomically/1]).
+-export([unique_account_number/0]).
+-export([put_account/1]).
 
 close_tables() ->
     dets:close(transfer),
@@ -83,6 +85,13 @@ get_all_transfers(AccountNumber) ->
 
 -spec unique_transfer_id() -> unique_id().
 unique_transfer_id() -> dets:update_counter(table_id, transfer, 1).
+
+-spec unique_account_number() -> unique_id().
+unique_account_number() -> dets:update_counter(table_id, account, 1).
+-spec put_account(#account{}) -> ok.
+put_account(#account{account_number = AccountNumber, amount = Amount}) ->
+    write(account, {AccountNumber, Amount}).
+
 
 % holdover from Mnesia
 -spec atomically(fun(() -> Ret)) -> Ret.
