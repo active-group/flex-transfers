@@ -2,6 +2,8 @@
 -module(web_frontend).
 -include("data.hrl").
 -export([init/2]).
+-export([amount_to_string/3]).
+-export([transfer/3]).
 
 
 -spec bin_to_int(binary()) -> integer().
