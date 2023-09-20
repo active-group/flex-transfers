@@ -56,61 +56,14 @@ amount_to_string(Amount, Currency, Format) ->
     AmountFormatted = number_formatter:format(Format, AmountExchanged),
     AmountFormatted ++ " " ++ Currency.
 
-
-%% returns the name of the person associated to the account nr
-%% given by account number.
--spec name_by_account_number(unique_id()) -> string().
-name_by_account_number(AccountNumber) ->
-    {ok, Account} = business_logic:get_account(AccountNumber),
-    name_by_account(Account).
-
-%% returns the name of the person associated to the account
-%% given by account.
--spec name_by_account(#account{}) -> string().
-name_by_account(Account) ->
-    {ok, Person}  = business_logic:get_person(Account#account.person_id),
-    io_lib:format("~s ~s", [Person#person.given_name, Person#person.surname]).
-
 -spec transfer(#transfer{}, string(), number_formatter:locale()) -> string().
 transfer(Transfer, Currency, Format) ->
-    Name1 = name_by_account_number(Transfer#transfer.from_account_number),
-    Name2 = name_by_account_number(Transfer#transfer.to_account_number),
+    AccountNumber1 = Transfer#transfer.from_account_number,
+    AccountNumber2 = Transfer#transfer.to_account_number,
     Amount = amount_to_string(Transfer#transfer.amount, Currency, Format),
     Date = date_formatter:format(Format, Transfer#transfer.timestamp),
     Id = Transfer#transfer.id,
-    io_lib:format(transfer_template(), [Id, Date, Amount, Name1, Name2]).
-
-head_template() ->
-    "<p> Name: ~s </p>
-     <p> Balance: ~s </p>
-     <table>
-      <tr>
-        <th>ID</th>
-        <th>Date</th>
-        <th>Amount</th>
-        <th>Sender</th>
-        <th>Receiver</th>
-      </tr> ".
-
-back_button() ->
-    "<a href=\"/\">Back </a>".
-
-footer_template() ->
-    "</table>" ++ back_button().
-
-
--spec head(#account{}, string(), number_formatter:locale()) -> string().
-head(Account, Currency, Format) ->
-    Amount = amount_to_string(Account#account.amount, Currency, Format),
-    Name =  name_by_account(Account),
-    io_lib:format(head_template(), [Name, Amount]).
-
--spec statement(#account{}, list(#transfer{}), string(), number_formatter:locale()) -> string().
-statement(Account, Transfers, Currency, Format) ->
-    % TODO append all transfers
-    TransfersString = lists:foldl(fun(Transfer, Acc) -> Acc ++ transfer(Transfer, Currency, Format) end, "", Transfers),
-    io_lib:format("~s ~s ~s", [head(Account, Currency, Format), TransfersString, footer_template()]).
-
+    io_lib:format(transfer_template(), [Id, Date, Amount, AccountNumber1, AccountNumber2]).
 
 index() ->
     io_lib:format("~s",
