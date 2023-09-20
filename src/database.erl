@@ -3,7 +3,7 @@
 -module(database).
 -include("data.hrl").
 -export([init_database/0, write/2, read_all/2,
-         put_transfer/1, unique_transfer_id/0,
+         put_transfer/1, get_transfer/1, get_all_transfers/0, get_all_transfers/1, unique_transfer_id/0,
          atomically/1]).
 
 close_tables() ->
@@ -35,9 +35,40 @@ read_all(Table, Deserialize) ->
     Res = dets:select(Table,[{'_',[],['$_']}]),    
     lists:map(Deserialize, Res).
 
+-spec read_one(dets:tab_name(), unique_id(), fun((tuple()) -> Obj)) -> {ok, Obj} | {error, not_found | more_than_one}.
+read_one(Table, Id, Deserialize) ->
+    Res = dets:lookup(Table, Id),
+    case Res of
+        [Tuple] -> {ok, Deserialize(Tuple)};
+        []  -> {error, not_found};
+        [_ | _] -> {error, more_than_one};
+        Error -> Error
+    end.
+
 -spec put_transfer(#transfer{}) -> ok.
 put_transfer(#transfer{id = Id, timestamp = Timestamp, from_account_number = FromAccountNumber, to_account_number = ToAccountNumber, amount = Amount}) ->
     write(transfer, {Id, Timestamp, FromAccountNumber, ToAccountNumber, Amount}).
+
+deserialize_transfer({Id, Timestamp, FromAccountNumber, ToAccountNumber, Amount}) ->
+    #transfer{id = Id, timestamp = Timestamp, from_account_number = FromAccountNumber, to_account_number = ToAccountNumber, amount = Amount}.
+    
+-spec get_transfer(unique_id()) -> {ok, #transfer{}} | {error, any()}.
+get_transfer(Id) ->
+    read_one(transfer, Id, fun deserialize_transfer/1).
+    
+-spec get_all_transfers() -> list(#transfer{}).
+get_all_transfers() -> read_all(transfer, fun deserialize_transfer/1).
+
+-spec get_all_transfers(account_number()) -> list(#transfer{}).
+get_all_transfers(AccountNumber) ->
+    Res = dets:select(transfer,
+                            [{'$1',
+                            [{'orelse',
+                                {'==', {element, 3, '$1'}, AccountNumber},
+                                {'==', {element, 4, '$1'}, AccountNumber}}],
+                            ['$_']}]),
+    lists:map(fun deserialize_transfer/1, Res).
+    
 
 -spec unique_transfer_id() -> unique_id().
 unique_transfer_id() -> dets:update_counter(table_id, transfer, 1).
