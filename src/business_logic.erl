@@ -56,6 +56,12 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
                         database:put_transfer(Transfer),
                         database:put_account(NewAccountSender),
                         database:put_account(NewAccountReceiver),
+                        events:put_event(#transfer_event{
+                                          source = transfer_service,
+                                          accountIdSender = SenderAccountNumber,
+                                          accountIdReceiver = ReceiverAccountNumber,
+                                          amount = Amount,
+                                          timestamp = erlang:timestamp()}),
                         {ok, TransferId};
                     true ->
                         {error, insufficient_funds}

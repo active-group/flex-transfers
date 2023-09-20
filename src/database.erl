@@ -31,6 +31,7 @@ init_database() ->
     close_tables(),
     destroy_tables(),
     create_tables(),
+    events:init_events(),
     ok.
 
 write(Table, Tuple) ->
