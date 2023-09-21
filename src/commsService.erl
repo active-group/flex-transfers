@@ -7,7 +7,7 @@
 -export([handle_cast/2]).
 -export([handle_call/3]).
 -export([start/0]).
--export([make_transaction/1]).
+-export([make_transactions/0]).
 -export([sendEvent/2]).
 -export([handle_events/1]).
 -export([send_events/2]).
@@ -19,7 +19,7 @@
 start() -> 
     {ok, PID} = gen_server:start(commsService, [], [{debug, [trace]}]),
     register(transfers, PID),
-    make_transaction(PID),
+    make_transactions(),
     PID.
 
 -spec init(list(#get_transfer_events_since{})) -> {ok, state()}.
@@ -85,9 +85,16 @@ sendEvent(#event{number = EventNumber, payload = EventMessage}, PID) ->
 handle_call(_Message, _From, State) ->
     {reply, ok, State}.
 
-make_transaction(PID) ->
+make_transactions() ->
     client:open_account(),
     client:open_account(),
     client:transfer(1, 2, 100),
-    gen_server:cast(PID, #get_transfer_events_since{since = 0, receiver_pid = self()}),
-    gen_server:cast(PID, send).
+    client:transfer(1, 2, 100),
+    client:transfer(1, 2, 100),
+    client:transfer(1, 2, 100),
+    client:transfer(1, 2, 100),
+    client:transfer(1, 2, 100),
+    client:transfer(2, 1, 10),
+    client:transfer(2, 1, 10),
+    client:transfer(2, 1, 10),
+    client:transfer(2, 1, 10).
