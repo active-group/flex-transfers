@@ -24,3 +24,7 @@
   account_number:: integer(),
   givenName:: string(),
   surname:: string()}).
+
+  -record(get_account_events_since, {
+        since :: integer(), receiver_pid :: pid()
+  }).
