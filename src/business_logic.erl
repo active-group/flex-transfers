@@ -64,12 +64,14 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
                         database:put_transfer(Transfer),
                         database:put_account(NewAccountSender),
                         database:put_account(NewAccountReceiver),
-                        events:put_event(#transfer_event{
-                                          source = transfer_service,
-                                          accountIdSender = SenderAccountNumber,
-                                          accountIdReceiver = ReceiverAccountNumber,
-                                          amount = Amount,
-                                          timestamp = erlang:timestamp()}),
+                        Event = #transfer_event{
+                            source = transfer_service,
+                            accountIdSender = SenderAccountNumber,
+                            accountIdReceiver = ReceiverAccountNumber,
+                            amount = Amount,
+                            timestamp = erlang:timestamp()},
+                        events:put_event(Event),
+                        trigger_event_push(Event),
                         {ok, TransferId};
                     true ->
                         {error, insufficient_funds}
@@ -83,3 +85,7 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
 
 sort_transfers(Transfers) ->
     lists:sort(fun(Transfer1, Transfer2) -> Transfer2#transfer.id < Transfer1#transfer.id end, Transfers).
+
+-spec trigger_event_push(#transfer_event{}) -> ok.
+trigger_event_push(Event) -> 
+    ok.
