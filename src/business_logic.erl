@@ -64,7 +64,7 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
                         database:put_transfer(Transfer),
                         database:put_account(NewAccountSender),
                         database:put_account(NewAccountReceiver),
-                        Event = #transfer_event{
+                        Event = #internal_transfer_event{
                             source = transfer_service,
                             accountIdSender = SenderAccountNumber,
                             accountIdReceiver = ReceiverAccountNumber,

@@ -52,7 +52,7 @@ get_transfer_events(Events) ->
     lists:filter(fun(#event{payload = Event}) -> is_transfer_event(Event) end, Events).
 
 -spec is_transfer_event(term()) -> boolean().
-is_transfer_event(#transfer_event{}) -> true;
+is_transfer_event(#internal_transfer_event{}) -> true;
 is_transfer_event(_) -> false.
 
 
@@ -68,9 +68,17 @@ send_events(List, PID) ->
 
 
 -spec sendEvent(#event{}, pid()) -> ok.
-sendEvent(#event{payload = EventMessage}, PID) ->
-    logger:info("Event ~p to PID ~p", [EventMessage, PID]),
-    gen_server:cast(PID, EventMessage),
+sendEvent(#event{number = EventNumber, payload = EventMessage}, PID) ->
+    EventToSend = #transfer_event{
+        eventId = EventNumber,
+        source = transfer_service,
+         accountIdSender = EventMessage#internal_transfer_event.accountIdSender,
+         accountIdReceiver = EventMessage#internal_transfer_event.accountIdReceiver,
+         amount = EventMessage#internal_transfer_event.amount,
+         timestamp = EventMessage#internal_transfer_event.timestamp
+    },
+    logger:info("Event ~p to PID ~p", [EventToSend, PID]),
+    gen_server:cast(PID, EventToSend),
     ok.
 
 handle_call(_Message, _From, State) ->

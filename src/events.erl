@@ -19,7 +19,6 @@ unique_event_number() -> dets:update_counter(table_id, event, 1).
 -spec put_event(term()) -> #event{}.
 put_event(Payload) ->
     Number = unique_event_number(),
-    numberedPayload = Payload#transfer_event{eventId = Number},
     database:write(event, {Number, Payload}),
     #event{number = Number, payload = Payload}.
 
