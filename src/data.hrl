@@ -10,8 +10,8 @@
          to_account_number :: account_number(),
          amount :: money()}).
 -record(transfer_event,
-        {eventId :: non_neg_integer(),
-        source :: transfer_service,
+        {source :: transfer_service,
+        eventId :: non_neg_integer(),
          accountIdSender :: non_neg_integer(),
          accountIdReceiver :: non_neg_integer(),
          amount :: number(),
