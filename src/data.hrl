@@ -12,10 +12,10 @@
 -record(transfer_event,
         {source :: transfer_service,
         eventId :: non_neg_integer(),
-         accountIdSender :: non_neg_integer(),
-         accountIdReceiver :: non_neg_integer(),
-         amount :: number(),
-         timestamp :: erlang:timestamp()}).
+        accountIdSender :: non_neg_integer(),
+        accountIdReceiver :: non_neg_integer(),
+        amount :: number(),
+        timestamp :: erlang:timestamp()}).
 -record(internal_transfer_event,
         {source :: transfer_service,
          accountIdSender :: non_neg_integer(),

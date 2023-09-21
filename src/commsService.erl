@@ -71,12 +71,12 @@ send_events(List, PID) ->
 -spec sendEvent(#event{}, pid()) -> ok.
 sendEvent(#event{number = EventNumber, payload = EventMessage}, PID) ->
     EventToSend = #transfer_event{
-        eventId = EventNumber,
         source = transfer_service,
-         accountIdSender = EventMessage#internal_transfer_event.accountIdSender,
-         accountIdReceiver = EventMessage#internal_transfer_event.accountIdReceiver,
-         amount = EventMessage#internal_transfer_event.amount,
-         timestamp = EventMessage#internal_transfer_event.timestamp
+        eventId = EventNumber,
+        accountIdSender = EventMessage#internal_transfer_event.accountIdSender,
+        accountIdReceiver = EventMessage#internal_transfer_event.accountIdReceiver,
+        amount = EventMessage#internal_transfer_event.amount,
+        timestamp = EventMessage#internal_transfer_event.timestamp
     },
     logger:info("Event ~p to PID ~p", [EventToSend, PID]),
     gen_server:cast(PID, EventToSend),
