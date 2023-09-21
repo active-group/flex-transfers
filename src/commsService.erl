@@ -18,6 +18,7 @@
 
 start() -> 
     {ok, PID} = gen_server:start(commsService, [], [{debug, [trace]}]),
+    register(transfer_service, PID),
     PID.
 
 -spec init(list(#get_transfer_events_since{})) -> {ok, state()}.
