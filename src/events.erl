@@ -1,5 +1,5 @@
 -module(events).
--export([init_events/0, put_events/1, get_all_events/0, get_events_from/1, get_events_from_with/2,
+-export([init_events/0, put_event/1, get_all_events/0, get_events_from/1, get_events_from_with/2,
          get_transfer_events/1]).
 -include("events.hrl").
 
