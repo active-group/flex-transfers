@@ -14,6 +14,7 @@
 
 start(AccountNode) -> 
     {ok, PID} = gen_server:start(receiveService, AccountNode, [{debug, [trace]}]),
+    register(transfers_accounts, PID),
     PID.
 
 -spec init({last: number(), accountNode: node()}) -> {ok, state()}.
