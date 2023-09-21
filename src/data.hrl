@@ -16,3 +16,10 @@
          amount :: number(),
          timestamp :: erlang:timestamp()}).
 -record(get_transfer_events_since, {since :: non_neg_integer(), receiver_pid :: pid()}).
+
+-record(account_event,
+  {id :: integer(),
+  eventType:: account_created,
+  account_number:: integer(),
+  givenName:: string(),
+  surname:: string()}).
