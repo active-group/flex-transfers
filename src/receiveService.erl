@@ -10,20 +10,20 @@
 
 -behaviour(gen_server).
 
--type state() :: {last: number(), accountNode: node()}.
+-type state() :: { number(),  node()}.
 
 start(AccountNode) -> 
-    {ok, PID} = gen_server:start(receiveService, AccountNode, [{debug, [trace]}]),
+    {ok, PID} = gen_server:start(receiveService, {0, AccountNode}, [{debug, [trace]}]),
     register(transfers_accounts, PID),
     PID.
 
--spec init({last: number(), accountNode: node()}) -> {ok, state()}.
-init({last= LastKnownEvent, accountNode = Node}) ->
+-spec init({ number(), node()}) -> {ok, state()}.
+init({LastKnownEvent, Node}) ->
     Events = events:get_all_events(),
     case Events of
        [] -> gen_server:cast({accounts, Node}, #get_account_events_since{since = 1, receiver_pid =self()}),
-       {ok, {0, Node}};
-       _ -> #event{number = LastKnownEvent} = lists:last(Events) ,{ok, {LastKnownEvent, Node}}            
+             {ok, {0, Node}};
+       _ -> #event{number = LastKnownEventFromDB} = lists:last(Events) ,{ok, {LastKnownEventFromDB, Node}}            
     end.
 
 -spec handle_cast(#account_event{}, state()) -> {noreply, state()}.
