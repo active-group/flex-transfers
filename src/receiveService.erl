@@ -21,11 +21,11 @@ start(AccountNode) ->
 init({LastKnownEvent, Node}) ->
     Events = events:get_all_events(),
     case Events of
-       [] -> logger:info("sending request to account service"),
+       [] -> logger:info("sending request to account service since ~p", [0]),
              gen_server:cast({accounts, Node}, #get_account_events_since{since = 0, receiver_pid =self()}),
              {ok, {0, Node}};
        _ -> #event{number = LastKnownEventFromDB} = lists:last(Events),
-             logger:info("sending request to account service"),
+             logger:info("sending request to account service since ~p", [LastKnownEventFromDB]),
              gen_server:cast({accounts, Node}, #get_account_events_since{since = LastKnownEventFromDB, receiver_pid =self()}),
              {ok, {LastKnownEventFromDB, Node}}            
     end.
