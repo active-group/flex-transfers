@@ -55,6 +55,7 @@ get_transfer_events(Events) ->
 is_transfer_event(#transfer_event{}) -> true;
 is_transfer_event(_) -> false.
 
+
 -spec send_events(list(#event{}), pid()) -> ok.
 send_events(List, PID) ->
     logger:info("Sending ~p", [List]),
