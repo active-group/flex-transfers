@@ -33,7 +33,7 @@ get_all_events() ->
 get_events_from(Number) ->
     Res = dets:select(event,
                         [{'$1',
-                        [{'>=', {element, 1, '$1'}, Number}],
+                        [{'>', {element, 1, '$1'}, Number}],
                         ['$_']}]),
     Events = lists:map(fun deserialize_event/1, Res),
     lists:sort(fun (#event{number = Number1}, #event{number = Number2}) -> Number1 =< Number2 end, Events).
