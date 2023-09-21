@@ -31,7 +31,7 @@ handle_cast(send, State) ->
     handle_events(State),
     {noreply, []};
 handle_cast(#get_transfer_events_since{} = Message, State) ->
-    logger:info("Adding request to state queue, ~s", [Message]),
+    logger:info("Adding request to state queue, ~p", [Message]),
     {noreply, [Message | State]}.
 
 -spec handle_events(list(#get_transfer_events_since{})) -> ok.
