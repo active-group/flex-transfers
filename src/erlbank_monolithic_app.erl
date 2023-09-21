@@ -30,6 +30,7 @@ start(_StartType, _StartArgs) ->
 
     AccountNode = node_util:node_from_env(accounts, "ACCOUNTS_HOST"),
     commsService:start(),
+    receiveService:start(AccountNode),
 
     erlbank_monolithic_sup:start_link().
 

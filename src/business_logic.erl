@@ -4,6 +4,7 @@
 -include("data.hrl").
 -export([transfer/3 , sort_transfers/1, get_transfers/1]).
 -export([open_account/0]).
+-export([open_account_with_account_number/1]).
 
 %% Opens an account, that is creates a new account containing a new person 
 %% Writes them into database.
@@ -11,6 +12,13 @@
 -spec open_account() -> #account{}.
 open_account() ->
     AccountNumber = database:unique_account_number(),
+    Account = #account{account_number = AccountNumber,
+                    amount = 1000},
+    database:put_account(Account),
+    Account.
+
+open_account_with_account_number(AccountNumber) ->
+    % later check unique?
     Account = #account{account_number = AccountNumber,
                     amount = 1000},
     database:put_account(Account),
