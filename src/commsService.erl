@@ -38,10 +38,21 @@ handle_cast(#get_transfer_events_since{} = Message, State) ->
 handle_events(List) ->
     logger:info("Sending ~p", [List]),
     lists:foreach(fun(#get_transfer_events_since{since = Since, receiver_pid = PID}) ->
-                    send_events(events:get_events_from(Since), PID)
+                    Events_from_number = events:get_events_from(Since),
+                    Transfer_events = get_transfer_events(Events_from_number),
+                    send_events(Transfer_events, PID)
                   end,
                   List),
     ok.
+
+-spec get_transfer_events(list(#event{})) -> list(#event{}).
+get_transfer_events(Events) ->
+    logger:info("Filtering Events for transfer_events"),
+    lists:filter(fun(#event{payload = Event}) -> is_transfer_event(Event) end, Events).
+
+-spec is_transfer_event(term()) -> boolean().
+is_transfer_event(#transfer_event{}) -> true;
+is_transfer_event(_) -> false.
 
 -spec send_events(list(#event{}), pid()) -> ok.
 send_events(List, PID) ->
@@ -51,6 +62,8 @@ send_events(List, PID) ->
                   end,
                   List),
     ok.
+
+
 
 -spec sendEvent(#event{}, pid()) -> ok.
 sendEvent(#event{payload = EventMessage}, PID) ->
