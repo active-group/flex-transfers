@@ -11,11 +11,18 @@
          amount :: money()}).
 -record(transfer_event,
         {eventId :: non_neg_integer(),
-         source :: transfer_service,
+        source :: transfer_service,
          accountIdSender :: non_neg_integer(),
          accountIdReceiver :: non_neg_integer(),
          amount :: number(),
          timestamp :: erlang:timestamp()}).
+-record(internal_transfer_event,
+        {source :: transfer_service,
+         accountIdSender :: non_neg_integer(),
+         accountIdReceiver :: non_neg_integer(),
+         amount :: number(),
+         timestamp :: erlang:timestamp()}
+        ).
 -record(get_transfer_events_since, {since :: non_neg_integer(), receiver_pid :: pid()}).
 
 -record(account_event,

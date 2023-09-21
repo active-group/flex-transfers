@@ -2,7 +2,6 @@
 -export([init_events/0, put_event/1, get_all_events/0, get_events_from/1, get_events_from_with/2,
          get_transfer_events/1]).
 -include("events.hrl").
--include("data.hrl").
 
 % call after database: init_database/0
 
@@ -19,7 +18,6 @@ unique_event_number() -> dets:update_counter(table_id, event, 1).
 -spec put_event(term()) -> #event{}.
 put_event(Payload) ->
     Number = unique_event_number(),
-    numberedPayload = Payload#transfer_event{eventId = Number},
     database:write(event, {Number, Payload}),
     #event{number = Number, payload = Payload}.
 
