@@ -87,5 +87,5 @@ sort_transfers(Transfers) ->
     lists:sort(fun(Transfer1, Transfer2) -> Transfer2#transfer.id < Transfer1#transfer.id end, Transfers).
 
 -spec trigger_event_push(#transfer_event{}) -> ok.
-trigger_event_push(Event) -> 
+trigger_event_push(_Event) -> 
     ok.
