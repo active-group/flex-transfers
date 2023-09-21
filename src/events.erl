@@ -1,5 +1,6 @@
 -module(events).
--export([init_events/0, put_event/1, get_all_events/0, get_events_from/1]).
+-export([init_events/0, put_events/1, get_all_events/0, get_events_from/1, get_events_from_with/2,
+         get_transfer_events/1]).
 -include("events.hrl").
 
 % call after database: init_database/0
@@ -36,3 +37,16 @@ get_events_from(Number) ->
                         ['$_']}]),
     Events = lists:map(fun deserialize_event/1, Res),
     lists:sort(fun (#event{number = Number1}, #event{number = Number2}) -> Number1 =< Number2 end, Events).
+
+-spec get_events_from_with(non_neg_integer(), any()) -> [#event{}].
+get_events_from_with(Number, MatchFun) ->
+    Res = dets:select(event,
+                        [{'$1',
+                        [{'andalso', {'>=', {element, 1, '$1'}, Number}, MatchFun({element, 2, '$1'})}],
+                        ['$_']}]),
+    Events = lists:map(fun deserialize_event/1, Res),
+    lists:sort(fun (#event{number = Number1}, #event{number = Number2}) -> Number1 =< Number2 end, Events).
+
+-spec get_transfer_events(non_neg_integer()) -> [#event{}].
+get_transfer_events(From) ->
+    get_events_from_with(From, fun (Payload) -> {'==', {element, 1, Payload}, transfer_event} end).
