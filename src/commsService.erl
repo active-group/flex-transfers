@@ -68,8 +68,8 @@ send_events(List, PID) ->
 
 -spec sendEvent(#event{}, pid()) -> ok.
 sendEvent(#event{payload = EventMessage}, PID) ->
-    logger:info("Event ~pto PID ~p", [EventMessage, PID]),
-    PID ! EventMessage,
+    logger:info("Event ~p to PID ~p", [EventMessage, PID]),
+    gen_server:cast(PID, EventMessage),
     ok.
 
 handle_call(_Message, _From, State) ->
