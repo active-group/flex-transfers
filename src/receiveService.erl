@@ -36,7 +36,7 @@ handle_info(alarm, {LastKnownEventFromDB, Node}) ->
     {noreply, {LastKnownEventFromDB, Node}}.
 
 -spec handle_cast(#account_event{}, state()) -> {noreply, state()}.
-handle_cast(#account_event{account_number = AccountNumber} = Message, _State) ->
+handle_cast(#account_event{account_number = AccountNumber} = Message, {_LastKnownEventFromDB, Node}) ->
     logger:info("processing event, ~p", [Message]),
     #event{number = LastKnownEvent} = events:put_event(Message),
     #account{account_number = AccountNumber} = business_logic:open_account_with_account_number(AccountNumber),
@@ -47,7 +47,7 @@ handle_cast(#account_event{account_number = AccountNumber} = Message, _State) ->
                                         amount = 1000,
                                         timestamp = erlang:timestamp()}),
     %message verarbeiten
-    {noreply, LastKnownEvent}.
+    {noreply, {LastKnownEvent, Node}}.
 
 handle_call(_Message, _From, State) ->
     {reply, ok, State}.
