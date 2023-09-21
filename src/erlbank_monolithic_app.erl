@@ -29,6 +29,7 @@ start(_StartType, _StartArgs) ->
     start_cowboy(),
 
     AccountNode = node_util:node_from_env(accounts, "ACCOUNTS_HOST"),
+    commsService:start(),
 
     erlbank_monolithic_sup:start_link().
 
