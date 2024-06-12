@@ -2,7 +2,7 @@
 
 -module(business_logic).
 -include("data.hrl").
--export([get_account/1, transfer/3, make_account/1]).
+-export([get_account/1, transfer/3, make_account/2]).
 
 
 %% Opens an account, that is creates a new account containing a new person 
@@ -12,10 +12,10 @@
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
 get_account(AccountNumber) -> database:get_account(AccountNumber).
 
--spec make_account(account_number()) -> #account{}.
-make_account(AccountNumber) ->
+-spec make_account(account_number(), money()) -> #account{}.
+make_account(AccountNumber, InitialAmount) ->
     Account = #account{account_number = AccountNumber,
-                   amount = 1000},
+                   amount = InitialAmount},
     database:put_account(Account),
     Account.
 

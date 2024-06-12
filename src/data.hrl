@@ -11,3 +11,10 @@
      from_account_number :: account_number(),
      to_account_number :: account_number(),
      amount :: money()}).
+
+
+%% API Stuff
+-record(ok, {identifier :: number()}).
+-record(account_created,
+  {account_number :: number(),
+  amount :: number()}).

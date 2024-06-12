@@ -2,14 +2,14 @@
 
 -module(client).
 -include("data.hrl").
--export([make_account/1, transfer/3]).
+-export([make_account/2, transfer/3]).
 
 
 %% opens an acocunt with a given name and surname.
 %% prints the result and the account number to stdout.
--spec make_account(account_number()) -> ok.
-make_account(AccountNumber) ->
-    Account = business_logic:make_account(AccountNumber),
+-spec make_account(account_number(), money()) -> ok.
+make_account(AccountNumber, Amount) ->
+    Account = business_logic:make_account(AccountNumber, Amount),
     io:format("Account was successfully opened. Account number: ~p ~n", [Account#account.account_number]).
 
 
