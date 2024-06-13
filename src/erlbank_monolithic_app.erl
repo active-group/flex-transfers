@@ -23,7 +23,9 @@ start_cowboy() ->
 
 
 start_sender() ->
-  transfer_succeeded_sender:start().
+  transfer_succeeded_sender:start(),
+  {ok, AckPid} = transfer_succeeded_sender:ack_handle_start(),
+  register(transfer_succeeded_ack, AckPid).
 
 
 start(_StartType, _StartArgs) ->

@@ -31,7 +31,8 @@ RegistryName: transfers
     amount :: number()}).
 
 Output
--record(ok, account_number: number())
+RegistryName: accounts
+-record(ok, {sender: binary(), account_number: number()})
 
 
 ## Out
@@ -47,4 +48,5 @@ RegistryName: statements
     timestamp :: erlang:timestamp()}).
 
 Input
--record(ok, transaction_id: number())
+RegistryName: transfer_succeeded_ack
+-record(ok, {sender: binary(), transaction_id: number()})
