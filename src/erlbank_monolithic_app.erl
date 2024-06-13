@@ -22,8 +22,14 @@ start_cowboy() ->
                                  #{env => #{dispatch => Dispatch}}).
 
 
+start_sender() ->
+  transfer_succeeded_sender:start().
+
+
 start(_StartType, _StartArgs) ->
     database:init_database(),
+    events:init_events(),
+    start_sender(),
     start_cowboy(),
     erlbank_monolithic_sup:start_link().
 

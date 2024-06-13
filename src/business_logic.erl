@@ -38,6 +38,7 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
     fun() ->
       MaybeAccountSender = database:get_account(SenderAccountNumber),
       MaybeAccountReceiver = database:get_account(ReceiverAccountNumber),
+      %todo: Sender muss ungleich Empfänger sein
       case {MaybeAccountSender, MaybeAccountReceiver} of
         {{error, not_found}, _} -> {error, sender_account_not_found};
         {_, {error, not_found}} -> {error, receiver_account_not_found};
@@ -59,6 +60,7 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
               database:put_transfer(Transfer),
               database:put_account(NewAccountSender),
               database:put_account(NewAccountReceiver),
+              events:put_event(#transaction_succeeded{transaction_id = Transfer#transfer.id, timestamp = Transfer#transfer.timestamp, from_account_number = Transfer#transfer.from_account_number, to_account_number = Transfer#transfer.to_account_number, amount = Transfer#transfer.amount}),
               {ok, TransferId};
             true ->
               {error, insufficient_funds}

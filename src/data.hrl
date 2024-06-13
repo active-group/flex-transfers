@@ -18,3 +18,10 @@
 -record(account_created,
   {account_number :: number(),
   amount :: number()}).
+
+-record(transaction_succeeded,
+{transaction_id :: unique_id(),
+  from_account_number :: account_number(),
+  to_account_number :: account_number(),
+  amount :: money(),
+  timestamp :: erlang:timestamp()}).
