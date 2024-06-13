@@ -24,8 +24,11 @@ put_event(Payload) ->
 -spec delete_transaction_succeeded_event(unique_id()) -> none().
 delete_transaction_succeeded_event(TransactionId) ->
   Pred = fun(#event{payload = Payload}) -> Payload#transaction_succeeded.transaction_id == TransactionId end,
-  [TransactionSucceededEvent | _] = lists:filter(Pred, get_all_events()),
-  database:delete(event, TransactionSucceededEvent#event.number).
+  case lists:filter(Pred, get_all_events()) of
+    [TransactionSucceededEvent | _] -> database:delete(event, TransactionSucceededEvent#event.number);
+    [] -> noop
+  end.
+
 
 -spec deserialize_event({non_neg_integer(), term()}) -> #event{}.
 deserialize_event({Number, Payload}) ->
