@@ -28,7 +28,10 @@ Input
 RegistryName: transfers
 -record(account_created,
     {account_number :: number(),
-    amount :: number()}).
+    given_name :: binary(),
+    surname :: binary(),
+    amount :: number(),
+    person_id :: number()}).
 
 Output
 RegistryName: accounts
@@ -41,11 +44,11 @@ RegistryName: accounts
 Output
 RegistryName: statements
 -record(transfer,
-    {transaction_id :: number(),
-    from_account_number :: account_number(),
-    to_account_number :: account_number(),
-    amount :: money(),
-    timestamp :: erlang:timestamp()}).
+        {id :: unique_id(),
+        timestamp :: erlang:timestamp(),
+        from_account_number :: account_number(),
+        to_account_number :: account_number(),
+        amount :: money()}).
 
 Input
 RegistryName: transfer_succeeded_ack
