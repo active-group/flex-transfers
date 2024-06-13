@@ -14,7 +14,7 @@
 
 
 %% API Stuff
--record(ok, {identifier :: number(), sender :: binary()}).
+-record(ok, {sender :: binary(), identifier :: number()}).
 -record(account_created,
 {account_number :: number(),
   given_name :: binary(),
