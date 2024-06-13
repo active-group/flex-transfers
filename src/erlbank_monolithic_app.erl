@@ -23,7 +23,7 @@ start_cowboy() ->
 
 
 start_account_listener() ->
-  {ok, ListenerPid} = account_created_listener:start(),
+  {ok, ListenerPid} = account_created_listener:account_listener_start(),
   register(transfers, ListenerPid).
 
 

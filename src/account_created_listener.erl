@@ -1,27 +1,21 @@
 -module(account_created_listener).
--export([listen/0, start/0, mockRecipient/0, startMockRecipient/0]).
+
 -include("data.hrl").
+-behaviour(gen_server).
 
-listen() ->
-  receive
-    #account_created{account_number = AccountNumber, amount = Amount} ->
-      Account = business_logic:make_account(AccountNumber, Amount),
-      case Account of
-        #account{account_number = AccountNumber} ->
-          gen_server:cast({accounts, node_util:node_from_env(accounts, "ACCOUNTS_HOST")}, #ok{identifier = AccountNumber, sender = <<transfers>>})
-      end,
-      listen()
-  end.
 
-start() ->
-  Pid = spawn(?MODULE, listen, []),
-  {ok, Pid}.
+-export([account_listener_start/0, handle_cast/2, handle_call/3, init/1]).
 
-mockRecipient() ->
-  receive
-    M -> io:format("Received ok with identifier ~w~n", [M])
-  end.
+init([]) -> {ok, []}.
+handle_call(Message, _From, _) -> noop.
+-spec handle_cast(#account_created{}, none()) -> none().
+handle_cast(#account_created{account_number = AccountNumber, amount = Amount}, _) ->
+  Account = business_logic:make_account(AccountNumber, Amount),
+  case Account of
+    #account{account_number = AccountNumber} ->
+      gen_server:cast({accounts, node_util:node_from_env(accounts, "ACCOUNTS_HOST")}, #ok{identifier = AccountNumber, sender = <<transfers>>})
+  end,
+  {noreply, []}.
 
-startMockRecipient() ->
-  Pid = spawn(?MODULE, mockRecipient, []),
-  {ok, Pid}.
+account_listener_start() ->
+  gen_server:start(?MODULE, [], [{debug, [trace]}]).
