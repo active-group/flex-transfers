@@ -13,7 +13,7 @@ handle_cast(#account_created{account_number = AccountNumber, amount = Amount}, _
   Account = business_logic:make_account(AccountNumber, Amount),
   case Account of
     #account{account_number = AccountNumber} ->
-      gen_server:cast({accounts, node_util:node_from_env(accounts, "ACCOUNTS_HOST")}, #ok{identifier = AccountNumber, sender = <<transfers>>})
+      gen_server:cast({accounts, node_util:node_from_env(accounts, "ACCOUNTS_HOST")}, #ok{identifier = AccountNumber, sender = <<"transfers">>})
   end,
   {noreply, []}.
 
