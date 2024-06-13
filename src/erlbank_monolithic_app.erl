@@ -36,6 +36,7 @@ start_sender() ->
 start(_StartType, _StartArgs) ->
     database:init_database(),
     events:init_events(),
+    start_account_listener(),
     start_sender(),
     start_cowboy(),
     erlbank_monolithic_sup:start_link().
