@@ -22,6 +22,11 @@ start_cowboy() ->
                                  #{env => #{dispatch => Dispatch}}).
 
 
+start_account_listener() ->
+  {ok, ListenerPid} = account_created_listener:start(),
+  register(transfers, ListenerPid).
+
+
 start_sender() ->
   transfer_succeeded_sender:start(),
   {ok, AckPid} = transfer_succeeded_sender:ack_handle_start(),

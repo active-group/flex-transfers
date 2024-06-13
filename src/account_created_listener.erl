@@ -8,7 +8,7 @@ listen() ->
       Account = business_logic:make_account(AccountNumber, Amount),
       case Account of
         #account{account_number = AccountNumber} ->
-          gen_server:cast({accounts, node_util:node_from_env(accounts, "")}, #ok{identifier = AccountNumber, sender = <<transfers>>})
+          gen_server:cast({accounts, node_util:node_from_env(accounts, "ACCOUNTS_HOST")}, #ok{identifier = AccountNumber, sender = <<transfers>>})
       end,
       listen()
   end.

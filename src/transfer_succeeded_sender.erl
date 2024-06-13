@@ -11,13 +11,7 @@ send_loop() ->
     [] -> send_loop();
     [First | _Rest] ->
       io:format("Sending message...~n"),
-      gen_server:cast({statements, node_util:node_from_env(statements, "")}, First#event.payload, 5000),
-      io:format("Received ~w~n", [Response]),
-      case Response of
-        #ok{identifier = TransactionId} -> events:delete_transaction_succeeded_event(TransactionId);
-        {error,sender_account_not_found} -> none;
-        true -> none
-      end,
+      gen_server:cast({statements, node_util:node_from_env(statements, "STATEMENTS_HOST")}, First#event.payload, 5000),
       send_loop()
   end.
 
