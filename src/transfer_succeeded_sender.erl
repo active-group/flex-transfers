@@ -11,7 +11,7 @@ send_loop() ->
     [] -> send_loop();
     [First | _Rest] ->
       io:format("Sending message...~n"),
-      gen_server:cast({statements, node_util:node_from_env(statements, "STATEMENTS_HOST")}, First#event.payload, 5000),
+      gen_server:cast({statements, node_util:node_from_env(statements, "STATEMENTS_HOST")}, First#event.payload),
       send_loop()
   end.
 
