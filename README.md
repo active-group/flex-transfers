@@ -1,4 +1,4 @@
-# Erlbank Monolithic
+# Erlbank Transfers
 
 Erlbank Legacy System
 
@@ -35,7 +35,7 @@ $ rebar3 shell
 You can set a short name via:
 
 ```
-$ rebar3 shell --sname=monolithic
+$ rebar3 shell --sname=transfers
 ```
 
 The web-frontend is served at http://localhost:8000/

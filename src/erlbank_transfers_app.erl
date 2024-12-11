@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc erlbank_monolithic public API
+%% @doc erlbank_transfers public API
 %% @end
 %%%-------------------------------------------------------------------
 
--module(erlbank_monolithic_app).
+-module(erlbank_transfers_app).
 
 -behaviour(application).
 
@@ -27,7 +27,7 @@ start_cowboy() ->
 start(_StartType, _StartArgs) ->
     database:init_database(),
     start_cowboy(),
-    erlbank_monolithic_sup:start_link().
+    erlbank_transfers_sup:start_link().
 
 stop(_State) ->
     ok.
