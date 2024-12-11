@@ -17,8 +17,9 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
 
     TransferFunction =
       fun() -> 
-        MaybeAccountSender = database:get_account(SenderAccountNumber),
-        MaybeAccountReceiver = database:get_account(ReceiverAccountNumber),
+
+        MaybeAccountSender = account_connector:get_account(SenderAccountNumber),
+        MaybeAccountReceiver = account_connector:get_account(ReceiverAccountNumber),
         case {MaybeAccountSender, MaybeAccountReceiver} of
             {{error, not_found}, _} -> {error, sender_account_not_found};
             {_, {error, not_found}} -> {error, receiver_account_not_found};
@@ -35,11 +36,11 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
                                             from_account_number = SenderAccountNumber,
                                             to_account_number = ReceiverAccountNumber,
                                             amount = Amount},
-                        NewAccountSender = AccountSender#account{amount = (AccountSenderAmount - Amount)},
                         NewAccountReceiver = AccountReceiver#account{amount = (AccountReceiverAmount + Amount)},
+                        NewAccountSender = AccountSender#account{amount = (AccountSenderAmount - Amount)},
                         database:put_transfer(Transfer),
-                        database:put_account(NewAccountSender),
-                        database:put_account(NewAccountReceiver),
+                        account_connector:put_account(NewAccountSender),
+                        account_connector:put_account(NewAccountReceiver),
                         {ok, TransferId};
                     true ->
                         {error, insufficient_funds}
