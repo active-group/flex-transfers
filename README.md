@@ -17,7 +17,7 @@ gen_server Call get_transfers:
      amount :: money()}))
 
 Beispiel: alle Transfers für Account-Nummer 1
-transfers_server:get_transfers(Pid, 1).
+gen_server:call(transfers_server, {get_transfers,1}).
 
 gen_server Call get_all_transfers_from:
 -record(get_all_transfers_from,{start_transfer::number()}).
@@ -29,7 +29,7 @@ gen_server Call get_all_transfers_from:
      amount :: money()}))
 
 Beispiel: alle Transfers ab Transfer-Id 3
-transfers_server:get_all_transfers_from(Pid, 3).
+gen_server:call(transfers_server, {get_all_transfers_from,3}).
 ```
 
 ## Build

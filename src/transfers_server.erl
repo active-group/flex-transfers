@@ -1,7 +1,7 @@
 -module(transfers_server).
 
 -behavior(gen_server).
--export([init/1,start/2,add/2,get_transfers/2,get_all_transfers_from/2,get_all_transfers_from/1,handle_cast/2,handle_call/3,handle_info/2]).
+-export([init/1,start/2,add/2,get_transfers/2,get_all_transfers_from/2,handle_cast/2,handle_call/3,handle_info/2]).
 -include("data.hrl").
 
 start(InitialN, NodeName) ->
@@ -34,11 +34,10 @@ handle_info(refresh, N) ->
 % get_transfers_from(Pid, AccountNumber, TransferId) ->
 %     gen_server:call(Pid, #get_transfers_from{accountNumber = AccountNumber, transferId = TransferId}).
 
-get_all_transfers_from(Pid, TransferId) ->
-    gen_server:call(Pid, #get_all_transfers_from{transferId = TransferId}).
-get_all_transfers_from(TransferId) ->
-    {ok, NPid} = self(),
-    gen_server:call(NPid, #get_all_transfers_from{transferId = TransferId}).
+% get_all_transfers_from(Pid, TransferId) ->
+%     gen_server:call(Pid, #get_all_transfers_from{transferId = TransferId}).
+get_all_transfers_from(ServerName, TransferId) ->
+    gen_server:call(ServerName, #get_all_transfers_from{transferId = TransferId}).
 
 get_transfers(Pid, AccountNumber) ->
     gen_server:call(Pid, #get_transfers{accountNumber = AccountNumber}).
