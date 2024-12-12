@@ -5,7 +5,7 @@ Erlbank Legacy System
 
 ## Interface Definition
 ```
-Es existiert ein transfers_server (gen_server) mit den Funktionen get_transfers und get_transfers_from.
+Es existiert ein transfers_server (gen_server) mit den Funktionen get_transfers und get_all_transfers_from.
 
 
 -record(get_transfers,{accountNumber :: number()}).
@@ -15,7 +15,7 @@ Es existiert ein transfers_server (gen_server) mit den Funktionen get_transfers 
      from_account_number :: account_number(),
      to_account_number :: account_number(),
      amount :: money()}))
--record(get_transfers_from,{accountNumber::number(),start_transfer::number()}).
+-record(get_all_transfers_from,{start_transfer::number()}).
 -> List(-record(transfer, 
     {id :: unique_id(), 
      timestamp :: erlang:timestamp(), 
