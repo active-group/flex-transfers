@@ -9,7 +9,7 @@ start(InitialN, NodeName) ->
 
 init({InitialN, NodeName}) ->
     % in dem neuen Prozeß, self()
-    % timer:send_interval(5000, refresh),
+    timer:send_interval(5000, refresh),
     {ok, {InitialN, NodeName}}.
 
 % cast: asynchrone Nachricht an den Server
@@ -23,7 +23,9 @@ handle_cast(#add{inc = Inc}, N) ->
 
 handle_info(refresh, N) ->
     account_connector_query(N),
-    {noreply, N}.
+    {noreply, N};
+handle_info(_,State) ->
+    {noreply,State}.
 
 % call: RPC mit Antwort
 % -record(query, {transferid :: number()}).
@@ -59,16 +61,16 @@ handle_call(#get_transfers{accountNumber = AccountNumber}, _From, _N) ->
 add_accounts([],Newest) ->
     {ok,Newest};    
 add_accounts(Accounts,_Newest) ->
-    [First | Rest] = Accounts,
-    #account{account_number = AccNum} = First,
-    database:put_account(First),
-    add_accounts(Rest,AccNum).
+    [{account_dto,Acc_Num,PersonId,_,_,Amount} | Rest] = Accounts,
+    database:put_account(#account{account_number = Acc_Num,person_id=PersonId,amount=Amount} ),
+    add_accounts(Rest,Acc_Num).
 
 -spec account_connector_query({number(),nodename}) -> {ok,number()}.
 account_connector_query({InitialN, NodeName}) ->
     io:format("get accounts from ~w~n", [InitialN]),
-    try gen_server:call({account_server, NodeName}, {subscribe,InitialN}) of
-        Accounts -> 
+    try gen_server:call({account_server, NodeName}, {subscribe,InitialN,self()}) of
+        Accounts ->
+            io:format("answer ~w~n",[Accounts]), 
             add_accounts(Accounts,InitialN),
             ok
     catch
