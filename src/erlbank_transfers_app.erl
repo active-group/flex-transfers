@@ -24,6 +24,7 @@ start_cowboy() ->
 
 start(_StartType, _StartArgs) ->
     database:init_database(),
+    AccountNode = node_util:node_from_env(accounts, "ACCOUNTS_HOST"),
     account_connector:init(local),
     start_cowboy(),
     erlbank_transfers_sup:start_link().
