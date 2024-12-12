@@ -70,7 +70,7 @@ account_connector_query({InitialN, NodeName}) ->
             add_accounts(Accounts,InitialN),
             ok
     catch
-        _ -> 
+        _:_ -> 
             io:format("get accounts failed~n"),
             noresponse
     end.
