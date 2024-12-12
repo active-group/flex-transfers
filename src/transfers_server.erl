@@ -48,14 +48,14 @@ get_transfers(Pid, AccountNumber) ->
 %     {reply,
 %      database:get_transfers_from(AccountNumber, TransferId),   % Antwort
 %      TransferId }; % neuer Zustand
-handle_call(#get_all_transfers_from{transferId = TransferId}, _From, _N) ->
+handle_call(#get_all_transfers_from{transferId = TransferId}, _From, State) ->
     {reply,
      database:get_transfers_from(TransferId),   % Antwort
-     TransferId }; % neuer Zustand
-handle_call(#get_transfers{accountNumber = AccountNumber}, _From, _N) ->
+     State }; % neuer Zustand
+handle_call(#get_transfers{accountNumber = AccountNumber}, _From, State) ->
     {reply,
      database:get_all_transfers(AccountNumber),   % Antwort
-     AccountNumber }. % neuer Zustand    
+     State }. % neuer Zustand    
 
 -spec add_accounts(list(#account{}), number()) -> number().
 add_accounts([],Newest) ->
