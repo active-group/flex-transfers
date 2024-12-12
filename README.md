@@ -7,7 +7,7 @@ Erlbank Legacy System
 ```
 Es existiert ein transfers_server (gen_server) mit den Funktionen get_transfers und get_all_transfers_from.
 
-
+gen_server Call get_transfers:
 -record(get_transfers,{accountNumber :: number()}).
 -> List(-record(transfer, 
     {id :: unique_id(), 
@@ -15,6 +15,11 @@ Es existiert ein transfers_server (gen_server) mit den Funktionen get_transfers 
      from_account_number :: account_number(),
      to_account_number :: account_number(),
      amount :: money()}))
+
+Beispiel: alle Transfers für Account-Nummer 1
+transfers_server:get_transfers(Pid, 1).
+
+gen_server Call get_all_transfers_from:
 -record(get_all_transfers_from,{start_transfer::number()}).
 -> List(-record(transfer, 
     {id :: unique_id(), 
@@ -23,6 +28,8 @@ Es existiert ein transfers_server (gen_server) mit den Funktionen get_transfers 
      to_account_number :: account_number(),
      amount :: money()}))
 
+Beispiel: alle Transfers ab Transfer-Id 3
+transfers_server:get_all_transfers_from(Pid, 3).
 ```
 
 ## Build
