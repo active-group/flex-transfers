@@ -18,7 +18,7 @@ start_cowboy() ->
                                              {"/transfers/create", web_frontend, create_transfer}]}]),
 
     {ok, _} = cowboy:start_clear(my_http_listener,
-                                 [{port, 8000}],
+                                 [{port, 8001}],
                                  #{env => #{dispatch => Dispatch}}).
 
 
