@@ -8,7 +8,8 @@
 
 -include("data.hrl").
 
--export([get_account/1,put_account/1,init/1]).
+-export([get_account/1,put_account/1,init/1,
+        account_connector_start/1]).
 
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
@@ -60,3 +61,42 @@ init(local) ->
 % erwartet 
 % {error, not_found}  -ODER
 %  {ok, #Account}
+account_connector_start(InitialN) ->
+    spawn(fun () -> account_connector_loop(InitialN) end).
+
+add_accounts([],Newest) ->
+    {ok,Newest};    
+add_accounts(Accounts,_Newest) ->
+    [First | Rest] = Accounts,
+    #account{account_number = AccNum} = First,
+    database:put_account(First),
+    add_accounts(Rest,AccNum).
+
+-spec account_connector_query(number()) -> {ok,number()}.
+account_connector_query(InitialN) ->
+    accounts = account_server:handle_call({subscribe, InitialN, self()}),
+    add_accounts(accounts,InitialN).
+
+
+    % Pid ! {query, self()},
+    % receive
+    %     N -> {ok, N}
+    % end.
+
+number_add(Pid, Inc) ->
+    Pid ! Inc.
+
+% init([]) ->
+%   Timer = erlang:send_after(1, self(), check),
+%   {ok, Timer}.
+
+handle_info({check, InitialN}, OldTimer) ->
+  erlang:cancel_timer(OldTimer),
+  {ok,NewN} = account_connector_query(InitialN),
+  Timer = erlang:send_after(1000, self(), {check, NewN}),
+  {noreply, Timer}.
+
+account_connector_loop(N) ->
+    Timer = erlang:send_after(1, self(), check),
+    {ok, Timer},
+    account_connector_loop(N).
