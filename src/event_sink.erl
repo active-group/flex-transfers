@@ -37,7 +37,7 @@ start(SourcePid) ->
 
 -spec init(pid()) -> {ok, state()}.
 init(SourcePid) ->
-  call(SourcePid , #register{}),
+  call(SourcePid , #register{pid = self()}),
   {ok, state}.
 
 -spec handle_call(any(), pid(), state()) -> {reply, any(), state()}.

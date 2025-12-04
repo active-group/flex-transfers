@@ -16,7 +16,7 @@ init(Pids) ->
   {ok, Pids}.
 
 -spec handle_call(#register{}, pid(), registered_pids()) -> {reply, any(), registered_pids()}.
-handle_call(#register{}, {Pid, _}, Registered_Pids) ->
+handle_call(#register{pid = Pid} , _, Registered_Pids) ->
   New_Pids = sets:add_element(Pid, Registered_Pids),
   {reply, ok, New_Pids}.
 
@@ -51,7 +51,7 @@ handle_cast(Event, Pids) ->
 
 
 -spec send_event_to_pids(event(), list(pid())) -> {any()}.
-send_event_to_pids(Event, []) -> ok;
+send_event_to_pids(_Event, []) -> ok;
 send_event_to_pids(Event, [First | Rest]) ->
   send_event(Event, First),
   send_event_to_pids(Event, Rest).
