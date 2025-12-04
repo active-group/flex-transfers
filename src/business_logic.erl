@@ -70,7 +70,7 @@ sort_transfers(Transfers) ->
     lists:sort(fun(Transfer1, Transfer2) -> Transfer2#transfer.id < Transfer1#transfer.id end, Transfers).
 
 -spec trigger_transfer_created_event(#transfer{}) -> any().
-trigger_transfer_created_event(#transfer{amount = Amount, from_account_number = From, to_account_number = To,
+trigger_transfer_created_event(#transfer{id = Id, amount = Amount, from_account_number = From, to_account_number = To,
   timestamp = Timestamp}) ->
-  gen_server:cast(event_sender, #transfer_creation_event{amount = Amount, from_account_number = From,
+  gen_server:cast(event_sender, #transfer_creation_event{id = Id, amount = Amount, from_account_number = From,
     to_account_number = To, timestamp = Timestamp}).
