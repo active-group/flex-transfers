@@ -1,6 +1,4 @@
--type unique_id() :: integer().
--type account_number() :: integer().
--type money() :: number().
+-include("data.hrl").
 
 -record(account_creation_event,
     {account_number :: account_number(), person_id :: unique_id()}).

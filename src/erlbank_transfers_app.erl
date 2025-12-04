@@ -29,9 +29,9 @@ start(_StartType, _StartArgs) ->
 
     AccountNode = node_util:node_from_env(accounts, "ACCOUNTS_HOST"),
     logger:info("Contacting accounts on: ~p~n", [AccountNode]),
-
+    event_sink:start({event_sender, AccountNode}),
     {ok, Pid} = event_server:start(),
-    register(transfers, Pid),
+    register(event_sender, Pid),
     erlbank_transfers_sup:start_link().
 
 stop(_State) ->

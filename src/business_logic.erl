@@ -1,7 +1,7 @@
 %% This module represents the business logic layer
 
 -module(business_logic).
--include("data.hrl").
+-include("event.hrl").
 -export([get_account/1, transfer/3, sort_transfers/1, get_transfers/1, make_account/1 ]).
 
 -spec get_account(account_number()) -> {ok, #account{}} | {error, any()}.
@@ -54,6 +54,7 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
                         database:put_transfer(Transfer),
                         database:put_account(NewAccountSender),
                         database:put_account(NewAccountReceiver),
+                        trigger_transfer_created_event(Transfer),
                         {ok, TransferId};
                     true ->
                         {error, insufficient_funds}
@@ -67,3 +68,9 @@ transfer(SenderAccountNumber, ReceiverAccountNumber, Amount) ->
 
 sort_transfers(Transfers) ->
     lists:sort(fun(Transfer1, Transfer2) -> Transfer2#transfer.id < Transfer1#transfer.id end, Transfers).
+
+-spec trigger_transfer_created_event(#transfer{}) -> any().
+trigger_transfer_created_event(#transfer{amount = Amount, from_account_number = From, to_account_number = To,
+  timestamp = Timestamp}) ->
+  gen_server:cast(event_sender, #transfer_creation_event{amount = Amount, from_account_number = From,
+    to_account_number = To, timestamp = Timestamp}).
